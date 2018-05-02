@@ -1,12 +1,11 @@
 //
-//  XHDatePickerView.m
+//  RLKDatePickerViewController.m
 //  XHDatePicker
 //
-//  Created by XH_J on 2016/10/25.
-//  Copyright © 2016年 XHJCoder. All rights reserved.
+//  Created by Realank on 2017/10/13.
+//  Copyright © 2017年 Realank. All rights reserved.
 //
-
-#import "XHDatePickerView.h"
+#import "RLKDatePickerViewController.h"
 #import "NSDate+XHExtension.h"
 
 #define kScreenWidth [UIScreen mainScreen].bounds.size.width
@@ -19,9 +18,8 @@
 #define MAXYEAR 2050
 #define MINYEAR 1970
 
-typedef void(^doneBlock)(NSDate *,NSDate *);
 
-@interface XHDatePickerView ()<UIPickerViewDelegate,UIPickerViewDataSource,UIGestureRecognizerDelegate> {
+@interface RLKDatePickerViewController ()<UIPickerViewDelegate,UIPickerViewDataSource,UIGestureRecognizerDelegate> {
     //日期存储数组
     NSMutableArray *_yearArray;
     NSMutableArray *_monthArray;
@@ -47,41 +45,35 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentView;
 @property (weak, nonatomic) IBOutlet UILabel *showYearView;
 @property (weak, nonatomic) IBOutlet UIButton *doneBtn;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomConstraint;
-
-- (IBAction)doneAction:(UIButton *)btn;
 
 
 @property (nonatomic,strong)UIPickerView *datePicker;
 @property (nonatomic, retain) NSDate *scrollToDate;//滚到指定日期
-@property (nonatomic,strong)doneBlock doneBlock;
 @property (weak, nonatomic) IBOutlet UILabel *informationLabel;
 
 
 @end
 
-@implementation XHDatePickerView
+@implementation RLKDatePickerViewController
 
--(instancetype)initWithCompleteBlock:(void(^)(NSDate *,NSDate *))completeBlock {
-    return [self initWithCurrentDate:nil CompleteBlock:completeBlock];
+- (void)viewDidLoad {
+    [super viewDidLoad];
+    // Do any additional setup after loading the view from its nib.
+    [self setupUI];
+    [_datePicker reloadAllComponents];
 }
 
--(instancetype)initWithCurrentDate:(NSDate *)currentDate CompleteBlock:(void (^)(NSDate *, NSDate *))completeBlock {
+-(instancetype)init{
+    return [self initWithCurrentDate:nil];
+}
+
+-(instancetype)initWithCurrentDate:(NSDate *)currentDate{
     self = [super init];
     if (self) {
-        self = [[[NSBundle bundleForClass:[self class]] loadNibNamed:NSStringFromClass([self class]) owner:self options:nil] lastObject];
-        
-        self.scrollToDate = currentDate;
-        
+        _scrollToDate = currentDate;
         _dateFormatter = @"yyyy-MM-dd HH:mm:ss";
-        [self setupUI];
-        [self defaultConfig];
         
-        if (completeBlock) {
-            self.doneBlock = ^(NSDate *startDate,NSDate *endDate) {
-                completeBlock(startDate,endDate);
-            };
-        }
+        [self defaultConfig];
     }
     return self;
 }
@@ -90,28 +82,10 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
     self.segmentView.selectedSegmentIndex = 0;
     [self.segmentView addTarget:self action:@selector(segmentAction:) forControlEvents:UIControlEventValueChanged];
     
-    self.buttomView.layer.cornerRadius = 10;
-    self.buttomView.layer.masksToBounds = YES;
-    //self.themeColor = [UIColor colorFromHexRGB:@"#f7b639"];
     self.themeColor = RGB(247, 133, 51);
-    self.frame=CGRectMake(0, 0, kScreenWidth, kScreenHeight);
-    
-    //点击背景是否影藏
-    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(dismiss)];
-    tap.delegate = self;
-    [self addGestureRecognizer:tap];
-    
-    self.bottomConstraint.constant = -self.frame.size.height;
-    self.backgroundColor = RGBA(0, 0, 0, 0);
-    [self layoutIfNeeded];
-    
-   
-    
-    
-    [[UIApplication sharedApplication].keyWindow bringSubviewToFront:self];
     
     [self.showYearView addSubview:self.datePicker];
-    
+    [self updateInfomationLabel];
 }
 
 - (void)updateInfomationLabel{
@@ -123,7 +97,7 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
     if (_endDate) {
         toString = [_endDate stringWithFormat:@"MMM dd,yyyy HH:mm:ss"];
     }
-    NSString* result = [NSString stringWithFormat:@"From:%@\nTo:%@",fromString,toString];
+    NSString* result = [NSString stringWithFormat:@"%@ To %@",fromString,toString];
     _informationLabel.text = result;
 }
 
@@ -167,7 +141,7 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
     if (!self.minLimitDate) {
         self.minLimitDate = [NSDate dateWithTimeIntervalSince1970:0];
     }
-    [self updateInfomationLabel];
+    
 }
 
 -(void)addLabelWithName:(NSArray *)nameArr {
@@ -330,7 +304,7 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
         case DateStyleShowMonthDayHourMinuteSecond:
             if (component==0) {
                 NSArray* monthArray = @[@"Jan",@"Feb",@"Mar",@"Apr",@"May",@"Jun",@"Jul",@"Aug",@"Sep",@"Oct",@"Nov",@"Dec"];
-                    NSInteger monthIndex = ((NSString*)(_monthArray[row%12])).integerValue - 1;
+                NSInteger monthIndex = ((NSString*)(_monthArray[row%12])).integerValue - 1;
                 title = monthArray[monthIndex];
             }else if (component==1) {
                 title = _dayArray[row];
@@ -346,7 +320,7 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
             title = @"";
             break;
     }
-
+    
     customLabel.text = title;
     customLabel.textColor = [UIColor blackColor];
     return customLabel;
@@ -433,7 +407,7 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
             
         }
             break;
-         
+            
         case DateStyleShowMonthDay:{
             if (component == 1) {
                 dayIndex = row;
@@ -557,25 +531,7 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
 
 
 #pragma mark - Action
--(void)show {
-    
-    [[UIApplication sharedApplication].keyWindow addSubview:self];
-    [UIView animateWithDuration:.3 animations:^{
-        self.bottomConstraint.constant = 10;
-        self.backgroundColor = RGBA(0, 0, 0, 0.4);
-        [self layoutIfNeeded];
-    }];
-}
--(void)dismiss {
-    [UIView animateWithDuration:.3 animations:^{
-        self.bottomConstraint.constant = -self.frame.size.height;
-        self.backgroundColor = RGBA(0, 0, 0, 0);
-        [self layoutIfNeeded];
-    } completion:^(BOOL finished) {
-        [self.subviews makeObjectsPerformSelector:@selector(removeFromSuperview)];
-        [self removeFromSuperview];
-    }];
-}
+
 
 
 
@@ -599,18 +555,8 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
 
 - (IBAction)doneAction:(UIButton *)btn {
     
-    switch (self.dateType) {
-        case DateTypeStartDate:
-            _startDate = [self.scrollToDate dateWithFormatter:_dateFormatter];
-            break;
-            
-        default:
-            _endDate = [self.scrollToDate dateWithFormatter:_dateFormatter];
-            break;
-    }
+    [self dismissViewControllerAnimated:YES completion:nil];
     
-    self.doneBlock(_startDate,_endDate);
-    [self dismiss];
 }
 
 #pragma mark - tools
@@ -764,7 +710,7 @@ typedef void(^doneBlock)(NSDate *,NSDate *);
         default:
             break;
     }
-    [self.datePicker reloadAllComponents];
 }
 
 @end
+

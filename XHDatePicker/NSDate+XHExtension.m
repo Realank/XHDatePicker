@@ -511,4 +511,11 @@ static const unsigned componentFlags = (NSCalendarUnitYear| NSCalendarUnitMonth 
     return [fmt dateFromString:selfStr];
 }
 
+-(NSString *)stringWithFormatter:(NSString *)formatter {
+    NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+    fmt.dateFormat = formatter;
+    NSString *selfStr = [fmt stringFromDate:self];
+    return selfStr;
+}
+
 @end

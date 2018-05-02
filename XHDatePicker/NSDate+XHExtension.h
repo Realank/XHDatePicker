@@ -112,5 +112,5 @@
 @property (readonly) NSInteger year;
 
 - (NSDate *)dateWithFormatter:(NSString *)formatter;
-
+-(NSString *)stringWithFormatter:(NSString *)formatter;
 @end

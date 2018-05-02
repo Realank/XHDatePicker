@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "XHDatePickerView.h"
+#import "RLKDatePickerViewController.h"
 #import "NSDate+XHExtension.h"
 
 @interface ViewController ()
@@ -39,8 +39,8 @@
             format = @"yyyy-MM-dd HH:mm";
             break;
         case 2:
-            dateStyle = DateStyleShowMonthDayHourMinute;
-            format = @"MM-dd HH:mm";
+            dateStyle = DateStyleShowMonthDayHourMinuteSecond;
+            format = @"MM-dd HH:mm:ss";
             break;
         case 3:
             dateStyle = DateStyleShowYearMonthDay;
@@ -62,27 +62,13 @@
     }
     
     
-    XHDatePickerView *datepicker = [[XHDatePickerView alloc] initWithCurrentDate:[NSDate date] CompleteBlock:^(NSDate *startDate, NSDate *endDate) {
-        NSLog(@"\n开始时间： %@，结束时间：%@",startDate,endDate);
-        if (startDate) {
-            self.startTimeText.text = [startDate stringWithFormat:format];
-        }
-        
-        if (endDate) {
-            self.endtimeText.text = [endDate stringWithFormat:format];
-        }
-        
-    }];
+    RLKDatePickerViewController *datepicker = [[RLKDatePickerViewController alloc] initWithCurrentDate:[NSDate date]];
     
-//    XHDatePickerView *datepicker = [[XHDatePickerView alloc] initWithCompleteBlock:^(NSDate *startDate,NSDate *endDate) {
-//        NSLog(@"\n开始时间： %@，结束时间：%@",startDate,endDate);
-//        self.startTimeText.text = [startDate stringWithFormat:@"yyyy-MM-dd HH:mm"];
-//        self.endtimeText.text = [endDate stringWithFormat:@"yyyy-MM-dd HH:mm"];
-//    }];
+
     datepicker.datePickerStyle = dateStyle;
     datepicker.dateType = DateTypeStartDate;
-    datepicker.minLimitDate = [NSDate date:@"2017-2-28 12:22" WithFormat:@"yyyy-MM-dd HH:mm"];
-    datepicker.maxLimitDate = [NSDate date:@"2018-2-28 12:12" WithFormat:@"yyyy-MM-dd HH:mm"];
-    [datepicker show];
+    datepicker.minLimitDate = [NSDate date:@"2017-2-28 12:22:34" WithFormat:@"yyyy-MM-dd HH:mm:ss"];
+    datepicker.maxLimitDate = [NSDate date:@"2018-2-28 12:12:56" WithFormat:@"yyyy-MM-dd HH:mm:ss"];
+    [self.navigationController pushViewController:datepicker animated:YES];
 }
 @end

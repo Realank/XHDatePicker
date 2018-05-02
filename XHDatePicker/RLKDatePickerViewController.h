@@ -1,13 +1,12 @@
 //
-//  XHDatePickerView.h
+//  RLKDatePickerViewController.h
 //  XHDatePicker
 //
-//  Created by XH_J on 2016/10/25.
-//  Copyright © 2016年 XHJCoder. All rights reserved.
+//  Created by Realank on 2017/10/13.
+//  Copyright © 2017年 Realank. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>
-
 typedef enum{
     DateStyleShowYearMonthDayHourMinute  = 0,
     DateStyleShowMonthDayHourMinute,
@@ -23,7 +22,10 @@ typedef enum{
     
 }XHDateType;
 
-@interface XHDatePickerView : UIView
+
+
+
+@interface RLKDatePickerViewController : UIViewController
 
 @property (nonatomic,assign)XHDateStyle datePickerStyle;
 @property (nonatomic,assign)XHDateType dateType;
@@ -32,16 +34,6 @@ typedef enum{
 @property (nonatomic, retain) NSDate *maxLimitDate;//限制最大时间（没有设置默认2049）
 @property (nonatomic, retain) NSDate *minLimitDate;//限制最小时间（没有设置默认1970）
 
--(instancetype)initWithCompleteBlock:(void(^)(NSDate *,NSDate *))completeBlock;
-
-/**
- *   设置打开选择器时的默认时间，
- *   minLimitDate < currentDate < maxLimitDate  显示 currentDate;
- *   currentDate < minLimitDate ||  currentDate > maxLimitDate   显示minLimitDate;
- */
--(instancetype)initWithCurrentDate:(NSDate *)currentDate CompleteBlock:(void(^)(NSDate *,NSDate *))completeBlock;
-
--(void)show;
-
+-(instancetype)initWithCurrentDate:(NSDate *)currentDate;
 
 @end
